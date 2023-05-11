@@ -3,6 +3,8 @@ package login
 import (
 	"app/pkg/validator"
 
+	"app/pkg/services/auth"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -13,6 +15,7 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	Message string `json:"message"`
+	Token   string `json:"token"`
 }
 
 func LoginHandler(c *fiber.Ctx) error {
@@ -29,8 +32,22 @@ func LoginHandler(c *fiber.Ctx) error {
 		})
 	}
 
+	if body.Email != "admin@site.com" && body.Password != "abc123123" {
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	token, err := auth.GenerateLoginToken(auth.LoginTokenPayload{
+		Id:   "000-10",
+		Role: "ADMIN",
+	})
+
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
 	res := LoginResponse{
 		Message: "login successful",
+		Token:   token,
 	}
 
 	return c.JSON(res)
