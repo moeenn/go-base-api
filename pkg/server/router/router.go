@@ -15,6 +15,6 @@ func RegisterRoutes(app *fiber.App) {
 	{
 		api.Get("/", home.HomeHandler)
 		api.Post("/login", login.LoginHandler)
-		api.Get("/profile", middleware.Protected(), profile.ProfileHandler)
+		api.Get("/profile", middleware.ValidateToken(), profile.ProfileHandler)
 	}
 }

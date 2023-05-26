@@ -5,6 +5,8 @@ import (
 
 	"app/pkg/services/auth"
 
+	"app/pkg/helpers"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -21,15 +23,11 @@ type LoginResponse struct {
 func LoginHandler(c *fiber.Ctx) error {
 	body := new(LoginRequest)
 	if err := c.BodyParser(body); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		return helpers.HTTPError(c, fiber.StatusBadRequest, err.Error())
 	}
 
 	if err := validator.ValidateStruct(body); err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{
-			"errors": err,
-		})
+		return helpers.ValidationError(c, err)
 	}
 
 	if body.Email != "admin@site.com" && body.Password != "abc123123" {
