@@ -1,6 +1,7 @@
 package login
 
 import (
+	"app/pkg/helpers/jwt"
 	"app/pkg/validator"
 
 	"app/pkg/services/auth"
@@ -8,6 +9,7 @@ import (
 	"app/pkg/helpers"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type LoginRequest struct {
@@ -17,7 +19,7 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	Message string `json:"message"`
-	Token   string `json:"token"`
+	Token   jwt.TokenResult
 }
 
 func LoginHandler(c *fiber.Ctx) error {
@@ -34,9 +36,9 @@ func LoginHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	token, err := auth.GenerateLoginToken(auth.LoginTokenPayload{
-		Id:   "000-10",
-		Role: "ADMIN",
+	token, err := auth.GenerateLoginToken(jwt.JWTPayload{
+		UserId:   uuid.New().String(),
+		UserRole: "ADMIN",
 	})
 
 	if err != nil {
@@ -45,7 +47,7 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	res := LoginResponse{
 		Message: "login successful",
-		Token:   token,
+		Token:   *token,
 	}
 
 	return c.JSON(res)

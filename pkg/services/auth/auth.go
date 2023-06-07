@@ -2,45 +2,26 @@ package auth
 
 import (
 	"app/pkg/config"
-	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"app/pkg/helpers/jwt"
 )
 
-type LoginTokenPayload struct {
-	Id   string
-	Role string
-}
+func GenerateLoginToken(payload jwt.JWTPayload) (*jwt.TokenResult, error) {
+	result, err := jwt.GenerateToken(
+		config.EnvConfig.Secret,
+		config.SecurityConfig.LoginTokenExpiryMinutes,
+		payload,
+	)
 
-func GenerateLoginToken(payload LoginTokenPayload) (string, error) {
-	claims := jwt.MapClaims{
-		"id":   payload.Id,
-		"role": payload.Role,
-		"exp":  time.Now().Add(time.Hour * 72).Unix(),
-	}
-
-	// Create token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte(config.EnvConfig.Secret))
 	if err != nil {
-		return "", err
+		return &jwt.TokenResult{}, err
 	}
 
-	return t, nil
+	return result, nil
 }
 
-// TODO: test
-func User(c *fiber.Ctx) LoginTokenPayload {
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-
-	result := LoginTokenPayload{
-		Id:   claims["id"].(string),
-		Role: claims["role"].(string),
-	}
-
-	return result
-}
+// func User(c *fiber.Ctx) (*jwt.JWTPayload, error) {
+// 	token := c.Locals("user").(*jwt.Token)
+// 	payload, err := jwt.ValidateToken(config.EnvConfig.Secret, token.Raw)
+// 	return payload, err
+// }
