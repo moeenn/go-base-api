@@ -1,15 +1,15 @@
 package auth
 
 import (
-	"app/pkg/config"
+	"app/config"
 
-	"app/pkg/helpers/jwt"
+	"app/pkg/jwt"
 )
 
-func GenerateLoginToken(payload jwt.JWTPayload) (*jwt.TokenResult, error) {
+func GenerateLoginToken(authConfig config.AuthConfig, payload jwt.JWTPayload) (*jwt.TokenResult, error) {
 	result, err := jwt.GenerateToken(
-		config.EnvConfig.Secret,
-		config.SecurityConfig.LoginTokenExpiryMinutes,
+		authConfig.JwtSecret,
+		authConfig.LoginTokenExpiryMinutes,
 		payload,
 	)
 
@@ -20,6 +20,7 @@ func GenerateLoginToken(payload jwt.JWTPayload) (*jwt.TokenResult, error) {
 	return result, nil
 }
 
+// TODO: implement
 // func User(c *fiber.Ctx) (*jwt.JWTPayload, error) {
 // 	token := c.Locals("user").(*jwt.Token)
 // 	payload, err := jwt.ValidateToken(config.EnvConfig.Secret, token.Raw)

@@ -24,5 +24,6 @@ func ValidateStruct(data any) []*ErrorResponse {
 			errors = append(errors, &element)
 		}
 	}
+
 	return errors
 }
