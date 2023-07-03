@@ -12,7 +12,13 @@ type ProfileResponse struct {
 }
 
 func ProfileHandler(c *gin.Context) {
-	userId := c.MustGet("userId").(string)
+	userId, ok := c.MustGet("userId").(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
 
 	res := ProfileResponse{
 		Message: "Hello world",

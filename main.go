@@ -20,6 +20,7 @@ func main() {
 	}
 
 	router := gin.Default()
+
 	api := router.Group("/api")
 	{
 		api.GET("/login", login.LoginHandler(conf.AuthConfig))
