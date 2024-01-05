@@ -1,6 +1,11 @@
-run:
-	godotenv -f .env -- go run .
+ENV = .env
 
+gensecret:
+	@openssl rand -hex 64
 
-test:
-	go test ./...
+# gotdotenv: go install github.com/joho/godotenv/cmd/godotenv@latest
+dev:
+	godotenv -f ${ENV} go run .
+
+prod:
+	go run .

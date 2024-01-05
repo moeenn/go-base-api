@@ -1,31 +1,31 @@
 package main
 
 import (
-	"app/config"
-	"app/pkg/middleware"
-	"fmt"
-	"os"
+	"web/internal/config"
+	"web/internal/controller"
+	"web/internal/helpers/jwthelpers"
+	"web/internal/helpers/validator"
 
-	"app/routes/login"
-	"app/routes/profile"
-
-	"github.com/gin-gonic/gin"
+	echojwt "github.com/labstack/echo-jwt/v4"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	conf, err := config.Load()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err.Error())
-		os.Exit(1)
-	}
+	config := config.New()
 
-	router := gin.Default()
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	authMiddleware := echojwt.WithConfig(jwthelpers.NewJWTConfig(config.Auth.JWTSecret))
 
-	api := router.Group("/api")
+	e.Validator = validator.New()
 	{
-		api.GET("/login", login.LoginHandler(conf.AuthConfig))
-		api.GET("/profile", middleware.ValidateToken(conf.AuthConfig.JwtSecret), profile.ProfileHandler)
+		e.POST("/login", controller.LoginHandler(config.Auth.JWTSecret))
+		e.GET("/protected", authMiddleware(controller.ProtectedHandler))
 	}
 
-	router.Run(conf.ServerConfig.Port)
+	if err := e.Start(config.Server.Address); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
