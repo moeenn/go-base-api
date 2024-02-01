@@ -17,13 +17,19 @@ type GlobalConfig struct {
 	Auth   AuthConfig
 }
 
-func New() *GlobalConfig {
-	return &GlobalConfig{
+func New() (*GlobalConfig, error) {
+	config := &GlobalConfig{
 		Server: ServerConfig{
 			Address: "0.0.0.0:5000",
 		},
-		Auth: AuthConfig{
-			JWTSecret: env.Env("JWT_SECRET"),
-		},
+		Auth: AuthConfig{},
 	}
+
+	jwtSecret, err := env.Env("JWT_SECRET")
+	if err != nil {
+		return config, err
+	}
+	config.Auth.JWTSecret = jwtSecret
+
+	return config, nil
 }
