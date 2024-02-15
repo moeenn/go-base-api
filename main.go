@@ -4,12 +4,9 @@ import (
 	"fmt"
 	"os"
 	"web/internal/config"
-	"web/internal/helpers/validator"
 	"web/internal/module/auth"
 	"web/internal/module/dashboard"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"web/internal/server"
 )
 
 func main() {
@@ -19,10 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Validator = validator.New()
+	e := server.New()
 	authMiddleware := auth.AuthMiddleware(config.Auth.JWTSecret)
 
 	api := e.Group("/api")
