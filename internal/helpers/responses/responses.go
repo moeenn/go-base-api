@@ -1,26 +1,26 @@
-package helpers
+package responses
 
-type APIOkResponse[T any] struct {
+type apiOkResponse[T any] struct {
 	Success bool `json:"success"`
 	Data    T    `json:"data"`
 }
 
-type APIErrorResponse struct {
+type apiErrorResponse struct {
 	Success    bool   `json:"success"`
 	Error      string `json:"error"`
 	StatusCode int    `json:"statusCode"`
 }
 
-func NewErrorResponse(status int, error string) APIErrorResponse {
-	return APIErrorResponse{
+func NewErrorResponse(status int, error string) apiErrorResponse {
+	return apiErrorResponse{
 		Success:    false,
 		Error:      error,
 		StatusCode: status,
 	}
 }
 
-func NewOkResponse[T any](data T) APIOkResponse[T] {
-	return APIOkResponse[T]{
+func NewOkResponse[T any](data T) apiOkResponse[T] {
+	return apiOkResponse[T]{
 		Success: true,
 		Data:    data,
 	}
